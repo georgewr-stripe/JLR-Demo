@@ -7,10 +7,8 @@ import {
 
 
 const navigation = [
-    { name: 'Product', href: '#' },
-    { name: 'Features', href: '#' },
-    { name: 'Marketplace', href: '#' },
-    { name: 'Company', href: '#' },
+    { name: 'Reserve', href: '/reserve' },
+    { name: 'Purchase', href: '/purchase' },
 ]
 
 const ToolbarSection = () => {
@@ -22,7 +20,7 @@ const ToolbarSection = () => {
             >
                 <div className="flex flex-1 items-center">
                     <div className="flex w-full items-center justify-between md:w-auto">
-                        <a href="#">
+                        <a href="/">
                             <span className="sr-only">Your Company</span>
                             <img
                                 className="h-8 w-auto sm:h-10"
@@ -57,7 +55,7 @@ const ToolbarSection = () => {
                         href="#"
                         className="inline-flex items-center rounded-md border border-transparent bg-darkGreen px-4 py-2 text-base font-medium text-white hover:bg-gray-700"
                     >
-                        Start free trial
+                        Book a Test Drive
                     </a>
                 </div>
             </nav>

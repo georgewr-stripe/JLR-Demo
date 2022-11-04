@@ -1,8 +1,4 @@
 import { loadStripe } from '@stripe/stripe-js';
-import nextSession from "next-session";
-
-
-export const getSession = nextSession();
 
 
 let stripePromise;
@@ -13,4 +9,8 @@ export const getStripe = () => {
     return stripePromise;
 };
 
-
+export const currencyFormatter = new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
+    minimumFractionDigits: 0
+});

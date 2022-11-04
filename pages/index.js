@@ -1,23 +1,42 @@
 
+import { useRouter } from 'next/router'
 import * as React from 'react'
-import LandingSection from '../sections/landing'
+import BookedInSection from '../sections/test_drive/bookedIn'
+import LandingSection from '../sections/test_drive/landing'
+import TestDriveSection from '../sections/test_drive/testDrive'
 import ToolbarSection from '../sections/toolbar'
-import VerificationSection from '../sections/verification'
+import VerificationSection from '../sections/test_drive/verification'
 
 
-export default function Demo() {
+export default function TestDrive() {
+
+  const router = useRouter()
 
   const sections = {
     landing: LandingSection,
-    verification: VerificationSection
+    verification: VerificationSection,
+    testDrive: TestDriveSection,
+    bookedIn: BookedInSection
   }
+
+  React.useEffect(() => {
+    if (router.query.section) {
+      setSection([router.query.section, {}])
+    }
+  }, [])
+
 
   const [section, setSection] = React.useState(['landing', {}])
 
+
+  const handleSectionChange = (sectionName, props) => {
+    router.push('/?section=' + sectionName, undefined, { shallow: true })
+    setSection([sectionName, props])
+  }
+
   const sectionContent = React.useMemo(() => {
     return Object.entries(sections).map(([key, Section]) => {
-      console.log(key)
-      return <Section key={key} show={section[0] == key} setSection={setSection} {...section[1]} />
+      return <Section key={key} show={section[0] == key} setSection={handleSectionChange} {...section[1]} />
     })
   }, [section])
 
