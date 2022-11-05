@@ -6,7 +6,8 @@ import ReservationPaymentSection from '../sections/reserve/payment'
 import PaymentConfirmationSection from '../sections/reserve/paymentConfirmation'
 import ToolbarSection from '../sections/toolbar'
 
-export default function TestDrive() {
+
+export default function Reserve() {
 
     const router = useRouter()
     const sections = {
@@ -14,15 +15,17 @@ export default function TestDrive() {
         reservationPayment: ReservationPaymentSection,
         paymentConfirmation: PaymentConfirmationSection
     }
+    const [section, setSection] = React.useState(['catalogue', {}])
 
     React.useEffect(() => {
         if (router.query.section) {
-            setSection([router.query.section, {}])
+            if (router.query.section !== section[0]) {
+                setSection([router.query.section, {}])
+            }
         }
-    }, [])
+    }, [section, router.query])
 
 
-    const [section, setSection] = React.useState(['catalogue', {}])
 
 
     const handleSectionChange = (sectionName, props) => {
@@ -47,5 +50,7 @@ export default function TestDrive() {
     </div>
 
 }
+
+
 
 

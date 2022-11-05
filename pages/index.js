@@ -18,15 +18,17 @@ export default function TestDrive() {
     testDrive: TestDriveSection,
     bookedIn: BookedInSection
   }
+  const [section, setSection] = React.useState(['landing', {}])
 
   React.useEffect(() => {
     if (router.query.section) {
-      setSection([router.query.section, {}])
+      if (router.query.section !== section[0]) {
+        setSection([router.query.section, {}])
+      }
     }
-  }, [])
+  }, [section, router.query])
 
 
-  const [section, setSection] = React.useState(['landing', {}])
 
 
   const handleSectionChange = (sectionName, props) => {

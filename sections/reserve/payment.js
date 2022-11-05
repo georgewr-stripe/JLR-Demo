@@ -5,11 +5,23 @@ import { Elements } from '@stripe/react-stripe-js'
 import { currencyFormatter, getStripe } from "../../utils";
 import ReservationPaymentForm from "./paymentForm";
 
+
+const appearance = {
+    theme: 'stripe',
+
+    variables: {
+        colorPrimary: '#0570de',
+        colorBackground: '#ffffff',
+        colorText: '#ffffff',
+    }
+};
+
 const ReservationPaymentSection = ({ show, setSection, total, car, config, client_secret }) => {
 
     const stripePromise = getStripe()
     const options = {
-        clientSecret: client_secret
+        clientSecret: client_secret,
+        appearance
     }
 
     if (!client_secret) {

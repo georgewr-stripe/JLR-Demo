@@ -9,27 +9,28 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
+export const cars = [
+    {
+        name: 'Defender 90', code: 'DEF-90', img: '/90.png', price: 61940
+    },
+    {
+        name: 'Defender 110', code: 'DEF-110', img: '/110.png', price: 64035
+    },
+    {
+        name: 'Defender 130', code: 'DEF-130', img: '/130.png', price: 80280
+    }
+]
+
+export const configurations = [
+    { name: 'Tow Bar', code: 'TOW-BAR', price: 780 },
+    { name: 'Electric Diff Lock', code: 'E-DIFF', price: 1120 },
+    { name: 'Snorkel', code: 'SNORKEL', price: 687 }
+]
 
 
 const CatalogueSection = ({ show, setSection }) => {
 
-    const cars = [
-        {
-            name: 'Defender 90', code: 'DEF-90', img: '/90.png', price: 61940
-        },
-        {
-            name: 'Defender 110', code: 'DEF-110', img: '/110.png', price: 64035
-        },
-        {
-            name: 'Defender 130', code: 'DEF-130', img: '/130.png', price: 80280
-        }
-    ]
 
-    const configurations = [
-        { name: 'Tow Bar', code: 'TOW-BAR', price: 780 },
-        { name: 'Electric Diff Lock', code: 'E-DIFF', price: 1120 },
-        { name: 'Snorkel', code: 'SNORKEL', price: 687 }
-    ]
 
     const [selectedCar, setSelectedCar] = React.useState(cars[0])
     const [selectedConfig, setSelectedConfig] = React.useState([])
@@ -126,7 +127,7 @@ const CatalogueSection = ({ show, setSection }) => {
     }, [selectedCar])
 
     const addOns = React.useMemo(() => {
-        return <div className="bg-white bg-transparent-500 z-20 p-5 absolute w-full self-center rounded-lg bottom-20"> <fieldset >
+        return <div className="bg-white bg-transparent-500 z-40 p-5 w-full rounded-lg mb-20"> <fieldset >
             <div className="flex flex-row justify-between">
                 <legend className="text-lg font-medium mt-5 text-gray-900 ">{selectedCar.name}</legend>
                 <legend className="text-lg font-medium mt-5 text-gray-900 ">Configuration</legend>
@@ -184,21 +185,18 @@ const CatalogueSection = ({ show, setSection }) => {
                                 <p className="text-base text-gray-300 sm:text-xl lg:text-lg xl:text-xl">
                                 </p>
                                 {carOptions}
-
                             </div>
                         </div>
-                        <div className="mt-12 -mb-16 sm:-mb-48 lg:relative lg:m-0">
+                        <div className="mt-12 -mb-16 sm:-mb-48 lg:relative lg:m-0 flex flex-col">
                             <div className="mx-auto max-w-md px-4 sm:max-w-2xl sm:px-6 lg:max-w-none lg:px-0">
-
                                 <img
                                     className="z-10 w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
                                     src="/defender.png"
                                     alt=""
                                 />
-
-                                {addOns}
-
                             </div>
+                            <div className="h-1/2"></div>
+                            {addOns}
                         </div>
                     </div>
                 </div>

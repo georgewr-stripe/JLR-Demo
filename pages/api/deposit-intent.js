@@ -14,12 +14,13 @@ export default async function handler(req, res) {
 
     const intent = await stripe.paymentIntents.create({
         customer: customer_id,
-        amount: 9900,
+        amount: total / 10,
         currency: 'GBP',
-        payment_method_types: ['card'],
-        description: car.name + ' Reservation Fee',
+        payment_method_types: ['card', 'bacs_debit', 'customer_balance'],
+        description: car.name + ' Deposit',
+        setup_future_usage: 'off_session',
         metadata: {
-            type: 'reservation-fee',
+            type: 'deposit',
             car: car.code,
             config: JSON.stringify(config.map(c => c.code)),
             total: JSON.stringify(total * 100)
