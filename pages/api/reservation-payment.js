@@ -23,7 +23,8 @@ export default async function handler(req, res) {
             car: car.code,
             config: JSON.stringify(config.map(c => c.code)),
             total: JSON.stringify(total * 100)
-        }
+        },
+        setup_future_usage: 'off_session'
     })
 
 

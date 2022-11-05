@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         customer: customer_id,
         collection_method: 'send_invoice',
         payment_settings: {
-            payment_method_types: ['customer_balance', 'card'],
+            payment_method_types: ['customer_balance', 'card', 'bacs_debit'],
             payment_method_options: {
                 customer_balance: {
                     funding_type: 'bank_transfer',
@@ -38,25 +38,65 @@ export default async function handler(req, res) {
     // Add the amount for the car
     await stripe.invoiceItems.create({
         customer: customer_id,
-        description: `${car.name} Full Payment`,
-        amount: (car.price * 100) - 9900,
+        description: `${car.name} Deposit`,
+        amount: 500000,
         currency: 'GBP',
         invoice: invoice.id
     });
-    if (config) {
-        for (let conf of config) {
-            await stripe.invoiceItems.create({
-                customer: customer_id,
-                description: conf.name,
-                amount: conf.price * 100,
-                currency: 'GBP',
-                invoice: invoice.id
-            });
+
+    const ppcProduct = await stripe.products.create({
+        name: `${car.name} PPC Repayment`,
+        metadata: {
+            customer_id: customer_id,
+            'JLR-PPC-ID': '12345'
         }
-    }
+    })
+
+
+    const monthly_amount = Math.ceil((reservation.total - 9900 - 5000000) / 24);
+    // Starting a subscription 30 days from now
+    const schedule = await stripe.subscriptionSchedules.create({
+        customer: customer_id,
+        start_date: Math.floor(new Date(new Date().setDate(new Date().getDate() + 30)).getTime() / 1000),
+        end_behavior: 'release',
+        phases: [
+            {
+                items: [{
+                    price_data: {
+                        currency: 'GBP',
+                        product: ppcProduct.id,
+                        unit_amount: monthly_amount,
+                        recurring: {
+                            interval: 'month'
+                        }
+                    },
+                    quantity: 1
+                }],
+                iterations: 24,
+                collection_method: 'send_invoice',
+                invoice_settings: {
+                    days_until_due: 30
+                }
+
+            }
+        ],
+        // payment_settings: {
+        //     payment_method_types: ['customer_balance', 'card', 'bacs_debit'],
+        //     payment_method_options: {
+        //         customer_balance: {
+        //             funding_type: 'bank_transfer',
+        //             bank_transfer: {
+        //                 type: 'gb_bank_transfer',
+        //             },
+        //         },
+        //     },
+        // },
+    });
+
+
 
     if (breakdown) {
-        const subscription = await stripe.subscriptions.create({
+        await stripe.subscriptions.create({
             customer: customer_id,
             description: 'Breakdown Cover',
             items: [{ price: breakdownPrice }],
@@ -84,6 +124,10 @@ export default async function handler(req, res) {
         payment_method_options: {
             card: {
                 setup_future_usage: 'off_session'
+            },
+            bacs_debit: {
+                setup_future_usage: 'off_session'
+
             }
         }
     })

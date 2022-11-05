@@ -4,7 +4,7 @@ import { Switch } from '@headlessui/react'
 import SectionTransition from "../../lib/sectionTransition";
 import { Elements } from '@stripe/react-stripe-js'
 import { currencyFormatter, getStripe } from "../../utils";
-import PayInFull from "./payInFull";
+import Payment from "./payment";
 
 
 const appearance = {
@@ -40,6 +40,9 @@ const ReservationsSection = ({ show, setSection, reservations }) => {
     const [clientSecret, setClientSecret] = React.useState()
     const [reservation, setReservation] = React.useState()
     const [breakdown, setBreakdown] = React.useState(false);
+    const [amount, setAmount] = React.useState(0)
+    const [isPPC, setIsPPC] = React.useState(false)
+    const [monthlyAmount, setMonthlyAmount] = React.useState(0)
     const stripePromise = getStripe()
 
     React.useEffect(() => {
@@ -55,17 +58,14 @@ const ReservationsSection = ({ show, setSection, reservations }) => {
     }, [breakdown, reservation])
 
     const payInFull = async () => {
-
+        setIsPPC(false)
+        setAmount(total)
+        setMonthlyAmount(breakdown ? 29 : 0)
         const req = await fetch('/api/pay-in-full', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ reservation, breakdown, total })
         })
-
-        // const req = await fetch('/api/setup-intent', {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        // })
 
         if (req.ok) {
             const { client_secret } = await req.json()
@@ -74,11 +74,27 @@ const ReservationsSection = ({ show, setSection, reservations }) => {
 
     }
 
+    const payByPPC = async () => {
+        setIsPPC(true)
+        setAmount(5000 + (breakdown ? 29 : 0))
+        setMonthlyAmount(Math.ceil((total - 99 - 5000) / 24) + (breakdown ? 29 : 0))
+        const req = await fetch('/api/pay-by-ppc', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reservation, breakdown, total })
+        })
+
+        if (req.ok) {
+            const { client_secret } = await req.json()
+            setClientSecret(client_secret)
+        }
+    }
+
     const paymentSection = React.useMemo(() => {
 
         if (clientSecret) {
             return <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
-                <PayInFull total={total} breakdown={breakdown} />
+                <Payment monthlyAmount={monthlyAmount} amount={amount} isPPC={isPPC} />
             </Elements>
         }
 
@@ -162,7 +178,7 @@ const ReservationsSection = ({ show, setSection, reservations }) => {
                         </button>
                         <button
                             disabled={!!clientSecret}
-                            onClick={() => null}
+                            onClick={payByPPC}
                             className="block w-full px-5 rounded-md bg-green py-3 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
                         >
                             PPC Leasing

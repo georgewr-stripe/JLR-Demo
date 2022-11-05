@@ -10,9 +10,22 @@ const appearance = {
     theme: 'stripe',
 
     variables: {
-        colorPrimary: '#0570de',
-        colorBackground: '#ffffff',
-        colorText: '#ffffff',
+        colorText: 'white',
+        // colorPrimary: '#ffffff',
+        colorBackgroundText: 'black',
+        colorPrimaryText: 'black',
+        colorTextPlaceholder: 'black',
+        colorIconTab: '#0F291D',
+        colorIconTabHover: '#0B6836',
+        colorIconTabSelected: '#0B6836'
+    },
+    rules: {
+        '.Input': {
+            color: 'black'
+        },
+        '.TabLabel': {
+            color: 'black'
+        }
     }
 };
 
