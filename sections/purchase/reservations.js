@@ -5,6 +5,7 @@ import SectionTransition from "../../lib/sectionTransition";
 import { Elements } from '@stripe/react-stripe-js'
 import { currencyFormatter, getStripe } from "../../utils";
 import Payment from "./payment";
+import Spinner from "../../lib/spinner";
 
 
 const appearance = {
@@ -43,6 +44,7 @@ const ReservationsSection = ({ show, setSection, reservations }) => {
     const [amount, setAmount] = React.useState(0)
     const [isPPC, setIsPPC] = React.useState(false)
     const [monthlyAmount, setMonthlyAmount] = React.useState(0)
+    const [loading, setLoading] = React.useState(false);
     const stripePromise = getStripe()
 
     React.useEffect(() => {
@@ -58,6 +60,7 @@ const ReservationsSection = ({ show, setSection, reservations }) => {
     }, [breakdown, reservation])
 
     const payInFull = async () => {
+        setLoading(true)
         setIsPPC(false)
         setAmount(total)
         setMonthlyAmount(breakdown ? 29 : 0)
@@ -71,10 +74,12 @@ const ReservationsSection = ({ show, setSection, reservations }) => {
             const { client_secret } = await req.json()
             setClientSecret(client_secret)
         }
+        setLoading(false)
 
     }
 
     const payByPPC = async () => {
+        setLoading(true)
         setIsPPC(true)
         setAmount(5000 + (breakdown ? 29 : 0))
         setMonthlyAmount(Math.ceil((total - 99 - 5000) / 24) + (breakdown ? 29 : 0))
@@ -88,6 +93,7 @@ const ReservationsSection = ({ show, setSection, reservations }) => {
             const { client_secret } = await req.json()
             setClientSecret(client_secret)
         }
+        setLoading(false)
     }
 
     const paymentSection = React.useMemo(() => {
@@ -172,16 +178,18 @@ const ReservationsSection = ({ show, setSection, reservations }) => {
                         <button
                             disabled={!!clientSecret}
                             onClick={payInFull}
-                            className="block w-full mr-2 px-5 rounded-md bg-green py-3 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+                            className="w-full flex flex-row justify-around align-middle mr-2 px-5 rounded-md bg-green py-3 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
                         >
                             Pay in Full
+                            {(loading && !isPPC) && <Spinner />}
                         </button>
                         <button
                             disabled={!!clientSecret}
                             onClick={payByPPC}
-                            className="block w-full px-5 rounded-md bg-green py-3 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+                            className="flex flex-row justify-around w-full px-5 rounded-md bg-green py-3 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
                         >
                             PPC Leasing
+                            {(loading && isPPC) && <Spinner />}
                         </button>
                     </div>
                 </div>

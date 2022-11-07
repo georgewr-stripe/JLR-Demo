@@ -3,6 +3,7 @@ import SectionTransition from "../../lib/sectionTransition";
 import { RadioGroup } from '@headlessui/react'
 import Image from 'next/image'
 import { currencyFormatter } from '../../utils'
+import Spinner from "../../lib/spinner";
 
 
 function classNames(...classes) {
@@ -34,6 +35,7 @@ const CatalogueSection = ({ show, setSection }) => {
 
     const [selectedCar, setSelectedCar] = React.useState(cars[0])
     const [selectedConfig, setSelectedConfig] = React.useState([])
+    const [loading, setLoading] = React.useState(false)
 
     const handleConfigChange = (e, conf) => {
         const { checked } = e.target;
@@ -59,6 +61,7 @@ const CatalogueSection = ({ show, setSection }) => {
 
     const confirmSelection = async (e) => {
         e.preventDefault()
+        setLoading(true);
         const req = await fetch('/api/reservation-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -66,6 +69,7 @@ const CatalogueSection = ({ show, setSection }) => {
         })
         if (req.ok) {
             const { client_secret } = await req.json()
+            setLoading(false);
             setSection('reservationPayment', { total, car: selectedCar, config: selectedConfig, client_secret })
         }
     }
@@ -158,9 +162,11 @@ const CatalogueSection = ({ show, setSection }) => {
                 <div className="text-xl font-bold">{currencyFormatter.format(total)}</div>
                 <button
                     onClick={confirmSelection}
-                    className="block bottom-6 ml-4 mt-2 w-full px-10 rounded-md bg-green py-3 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+                    className="flex flex-row justify-around bottom-6 ml-4 mt-2 w-full px-10 rounded-md bg-green py-3 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
                 >
                     Reserve for £99
+                    {loading && <Spinner />}
+
                 </button>
             </div>
 

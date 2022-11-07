@@ -27,7 +27,7 @@ const ReservationPaymentForm = () => {
 
 
         if (error) {
-            alert(error)
+            console.log(error)
         } else {
             setSection('PaymentConfirmation', {})
         }

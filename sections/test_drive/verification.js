@@ -2,10 +2,12 @@ import React from "react"
 import SectionTransition from "../../lib/sectionTransition";
 import { getStripe } from "../../utils";
 import { setCookie } from 'cookies-next';
+import Spinner from "../../lib/spinner";
 
 const VerificationSection = ({ email, show, setSection }) => {
 
     const [name, setName] = React.useState('')
+    const [loading, setLoading] = React.useState(false)
 
     const [stripe, setStripe] = React.useState()
 
@@ -15,6 +17,7 @@ const VerificationSection = ({ email, show, setSection }) => {
 
 
     const verify = async (e) => {
+        setLoading(true)
         e.preventDefault()
 
         if (!name) {
@@ -33,6 +36,7 @@ const VerificationSection = ({ email, show, setSection }) => {
             const { client_secret, customer_id } = await req.json()
 
             setCookie('jlr_customer_id', customer_id)
+            setLoading(false)
 
             const { error } = await stripe.verifyIdentity(client_secret);
 
@@ -43,6 +47,7 @@ const VerificationSection = ({ email, show, setSection }) => {
                 setSection('testDrive', {})
             }
         }
+        setLoading(false)
     }
 
 
@@ -83,9 +88,10 @@ const VerificationSection = ({ email, show, setSection }) => {
                                                 <button
                                                     disabled={!stripe}
                                                     onClick={verify}
-                                                    className="block w-full px-10 rounded-md bg-green py-3 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+                                                    className="flex flex-row justify-around w-full px-10 rounded-md bg-green py-3 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
                                                 >
                                                     Verify
+                                                    {loading && <Spinner />}
                                                 </button>
                                             </div>
                                         </div>
