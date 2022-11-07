@@ -9,6 +9,7 @@ export default async function handler(req, res) {
 
   const verificationSession = await stripe.identity.verificationSessions.create({
     type: 'document',
+
     metadata: {
       email,
       customer_id: customer.id

@@ -1,9 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 const stripe = require('stripe')(process.env.STRIPE_SK)
 import { getCookie } from 'cookies-next';
+import _getBreakdownPrice from './_getBreakdownPrice';
 
-
-const breakdownPrice = 'price_1M0sKFG0XQZfty507ko1LdDl'
 
 export default async function handler(req, res) {
 
@@ -21,7 +20,7 @@ export default async function handler(req, res) {
         customer: customer_id,
         collection_method: 'send_invoice',
         payment_settings: {
-            payment_method_types: ['customer_balance', 'card'],
+            payment_method_types: ['customer_balance'],
             payment_method_options: {
                 customer_balance: {
                     funding_type: 'bank_transfer',
@@ -56,6 +55,8 @@ export default async function handler(req, res) {
     }
 
     if (breakdown) {
+        const breakdownPrice = await _getBreakdownPrice()
+
         const subscription = await stripe.subscriptions.create({
             customer: customer_id,
             description: 'Breakdown Cover',
@@ -63,7 +64,7 @@ export default async function handler(req, res) {
             days_until_due: 0,
             collection_method: 'send_invoice',
             payment_settings: {
-                payment_method_types: ['customer_balance', 'card', 'bacs_debit'],
+                payment_method_types: ['customer_balance'],
                 payment_method_options: {
                     customer_balance: {
                         funding_type: 'bank_transfer',
@@ -80,13 +81,13 @@ export default async function handler(req, res) {
 
     const intent = await stripe.paymentIntents.retrieve(invoice.payment_intent)
 
-    await stripe.paymentIntents.update(intent.id, {
-        payment_method_options: {
-            card: {
-                setup_future_usage: 'off_session'
-            }
-        }
-    })
+    // await stripe.paymentIntents.update(intent.id, {
+    //     payment_method_options: {
+    //         card: {
+    //             setup_future_usage: 'off_session'
+    //         }
+    //     }
+    // })
 
     res.status(200).json({ client_secret: intent.client_secret })
 }

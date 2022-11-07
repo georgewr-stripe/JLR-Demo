@@ -136,7 +136,7 @@ const CatalogueSection = ({ show, setSection }) => {
                 <legend className="text-lg font-medium mt-5 text-gray-900 ">{selectedCar.name}</legend>
                 <legend className="text-lg font-medium mt-5 text-gray-900 ">Configuration</legend>
             </div>
-            <div className="mt-4 divide-y divide-darkGrey border-t border-b border-darkGrey">
+            <div className="mt-9 divide-y divide-darkGrey border-t border-b border-darkGrey">
                 {configurations.map((conf, confID) => (
                     <div key={confID} className="relative flex items-start justify-around py-4">
                         <div className="min-w-0 flex-1  text-sm">
@@ -188,7 +188,8 @@ const CatalogueSection = ({ show, setSection }) => {
                                         Defender
                                     </span>
                                 </h1>
-                                <p className="text-base text-gray-300 sm:text-xl lg:text-lg xl:text-xl">
+                                <p className="text-base text-gray-300 sm:text-xl mb-3 lg:text-lg xl:text-xl">
+                                    Select a model and any optional extras
                                 </p>
                                 {carOptions}
                             </div>

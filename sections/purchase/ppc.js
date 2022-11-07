@@ -6,6 +6,7 @@ import { Elements } from '@stripe/react-stripe-js'
 import { currencyFormatter, getStripe } from "../../utils";
 import Payment from "./payment";
 import Spinner from "../../lib/spinner";
+import { useRouter } from "next/router";
 
 
 const appearance = {
@@ -32,7 +33,7 @@ const appearance = {
         '.Block': {
             color: 'black !important'
         },
-        '.u-lh': {
+        '.PickerItem': {
             color: 'black'
         },
         '.p-Logo': {
@@ -46,15 +47,17 @@ function classNames(...classes) {
 }
 
 
-const ReservationsSection = ({ show, setSection, reservations }) => {
+const PPCSection = ({ show, setSection, reservations, breakdown }) => {
 
     const [clientSecret, setClientSecret] = React.useState()
     const [reservation, setReservation] = React.useState()
-    const [breakdown, setBreakdown] = React.useState(false);
-    const [amountText, setAmountText] = React.useState('')
+    const [amountText, setAmountText] = React.useState(0)
     const [isPPC, setIsPPC] = React.useState(false)
+    const [monthlyAmount, setMonthlyAmount] = React.useState(0)
     const [loading, setLoading] = React.useState(false);
     const stripePromise = getStripe()
+
+    const router = useRouter();
 
     React.useEffect(() => {
         if (reservations.length) {
@@ -64,51 +67,37 @@ const ReservationsSection = ({ show, setSection, reservations }) => {
 
     const total = React.useMemo(() => {
         if (reservation) {
-            return (reservation.total / 100) + (breakdown ? 29 : 0) - 99
+            return (reservation.total / 100) - 5000 + (breakdown ? 29 : 0) - 99
         } return 0
     }, [breakdown, reservation])
 
-    const payInFull = async () => {
-        setLoading(true)
-        setIsPPC(false)
-        const a = currencyFormatter.format(total)
-        setAmountText(`${a} ${breakdown ? `then ${currencyFormatter.format(br)} /mo` : ''}`)
-        const req = await fetch('/api/pay-in-full', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ reservation, breakdown, total })
-        })
 
-        if (req.ok) {
-            const { client_secret } = await req.json()
-            setClientSecret(client_secret)
+    React.useEffect(() => {
+        if (reservation) {
+            (async () => {
+                setLoading(true)
+                setIsPPC(true)
+                const a = currencyFormatter.format(Math.ceil((total - 99 - 5000) / 24) + (breakdown ? 29 : 0))
+                setAmountText(`${a} /mo`)
+                const req = await fetch('/api/pay-by-ppc', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reservation, breakdown, total })
+                })
+
+                if (req.ok) {
+                    const { client_secret } = await req.json()
+                    setClientSecret(client_secret)
+                }
+                setLoading(false)
+            })()
         }
-        setLoading(false)
-
-    }
-
-    const payByPPC = async () => {
-        setLoading(true)
-        setIsPPC(true)
-        setAmountText(currencyFormatter.format(5000))
-        const req = await fetch('/api/deposit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ reservation, breakdown, total })
-        })
-
-        if (req.ok) {
-            const { client_secret } = await req.json()
-            setClientSecret(client_secret)
-        }
-        setLoading(false)
-    }
-
+    }, [breakdown, reservation])
     const paymentSection = React.useMemo(() => {
 
         if (clientSecret) {
             return <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
-                <Payment amountText={amountText} isPPC={isPPC} />
+                <Payment amountText={amountText} />
             </Elements>
         }
 
@@ -152,7 +141,6 @@ const ReservationsSection = ({ show, setSection, reservations }) => {
                         <Switch
                             disabled={!!clientSecret}
                             checked={breakdown}
-                            onChange={setBreakdown}
                             className={classNames(
                                 breakdown ? 'bg-green' : 'bg-darkGreen',
                                 'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-darkGrey focus:ring-offset-2'
@@ -183,22 +171,7 @@ const ReservationsSection = ({ show, setSection, reservations }) => {
 
                     <div className="text-lg pt-2">Total to Pay: {currencyFormatter.format(total)}</div>
                     <div className="flex flex-row justify-between pt-4">
-                        <button
-                            disabled={!!clientSecret}
-                            onClick={payInFull}
-                            className="w-full flex flex-row justify-around align-middle mr-2 px-5 rounded-md bg-green py-3 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
-                        >
-                            Pay in Full
-                            {(loading && !isPPC) && <Spinner />}
-                        </button>
-                        <button
-                            disabled={!!clientSecret}
-                            onClick={payByPPC}
-                            className="flex flex-row justify-around w-full px-5 rounded-md bg-green py-3 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
-                        >
-                            PPC Leasing
-                            {(loading && isPPC) && <Spinner />}
-                        </button>
+
                     </div>
                 </div>
             )
@@ -240,4 +213,4 @@ const ReservationsSection = ({ show, setSection, reservations }) => {
 
 
 
-export default ReservationsSection
+export default PPCSection

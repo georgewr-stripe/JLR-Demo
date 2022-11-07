@@ -48,9 +48,7 @@ const ToolbarSection = () => {
                     </div>
                 </div>
                 <div className="hidden md:flex md:items-center md:space-x-6">
-                    <a href="#" className="text-base font-medium text-black hover:text-darkGrey">
-                        Log in
-                    </a>
+
                     <a
                         href="#"
                         className="inline-flex items-center rounded-md border border-transparent bg-darkGreen px-4 py-2 text-base font-medium text-white hover:bg-gray-700"

@@ -4,7 +4,7 @@ import SectionTransition from '../../lib/sectionTransition';
 import { currencyFormatter } from '../../utils';
 
 
-const Payment = ({ amount, isPPC, monthlyAmount }) => {
+const Payment = ({ amountText, isPPC }) => {
 
     const stripe = useStripe();
     const elements = useElements();
@@ -18,7 +18,7 @@ const Payment = ({ amount, isPPC, monthlyAmount }) => {
         }
 
         const { protocol, hostname, port } = window.location
-        const redirectURL = `${protocol}//${hostname}${port && ':' + port}/purchase?section=paymentConfirmation`
+        const redirectURL = `${protocol}//${hostname}${port && ':' + port}/purchase?section=${isPPC ? 'ppc' : 'paymentConfirmation'}`
 
         const { error } = await stripe.confirmPayment({
             elements,
@@ -40,7 +40,7 @@ const Payment = ({ amount, isPPC, monthlyAmount }) => {
         <button
             className="block bottom-6  mt-4 w-full px-10 rounded-md bg-green py-3 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
         >
-            Pay {currencyFormatter.format(amount)}{isPPC && ' Deposit'} {monthlyAmount > 0 && `then ${currencyFormatter.format(monthlyAmount)} /mo`}
+            Pay {amountText}
         </button>
     </form>
     </SectionTransition>

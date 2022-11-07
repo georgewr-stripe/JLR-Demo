@@ -8,6 +8,7 @@ import ToolbarSection from '../sections/toolbar'
 import { getCookie } from 'cookies-next'
 import { cars, configurations } from "../sections/reserve/catalogue";
 import PaymentConfirmationSection from '../sections/purchase/paymentConfirmation'
+import PPCSection from '../sections/purchase/ppc'
 
 const stripe = require('stripe')(process.env.STRIPE_SK)
 
@@ -17,7 +18,8 @@ export default function Purchase(props) {
     const router = useRouter()
     const sections = {
         reservations: ReservationsSection,
-        paymentConfirmation: PaymentConfirmationSection
+        paymentConfirmation: PaymentConfirmationSection,
+        ppc: PPCSection
     }
     const [section, setSection] = React.useState(['reservations', {}])
 
@@ -56,9 +58,9 @@ export default function Purchase(props) {
 }
 
 
-export async function getServerSideProps({ req, res }) {
+export async function getServerSideProps({ req, res, query }) {
 
-    const props = { reservations: [] };
+    const props = { reservations: [], breakdown: false };
 
     const customer_id = getCookie('jlr_customer_id', { req, res })
 
@@ -82,6 +84,18 @@ export async function getServerSideProps({ req, res }) {
                 })
             })
 
+        }
+    }
+
+    if (query?.payment_intent) {
+        try {
+            const pi = await stripe.paymentIntents.retrieve(query.payment_intent)
+            if (pi.metadata?.breakdown == 'true') {
+                props.breakdown = true;
+            }
+
+        } catch (e) {
+            console.log(e)
         }
     }
 

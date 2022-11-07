@@ -14,5 +14,5 @@ export default async function handler(req, res) {
 
     const intent = await stripe.paymentIntents.retrieve(payment_intent, { expand: ['invoice'] });
 
-    res.status(200).json({ url: intent.invoice.invoice_pdf })
+    res.status(200).json({ url: intent.invoice?.invoice_pdf })
 }
