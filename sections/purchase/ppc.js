@@ -71,28 +71,32 @@ const PPCSection = ({ show, setSection, reservations, breakdown }) => {
         } return 0
     }, [breakdown, reservation])
 
+    const loadPPC = async () => {
+        setLoading(true)
+        setIsPPC(true)
+        const a = currencyFormatter.format(Math.ceil((total - 99 - 5000) / 24) + (breakdown ? 29 : 0))
+        setAmountText(`${a} /mo`)
+        const req = await fetch('/api/pay-by-ppc', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reservation, breakdown, total })
+        })
+
+        if (req.ok) {
+            const { client_secret } = await req.json()
+            setClientSecret(client_secret)
+        }
+        setLoading(false)
+    }
+
 
     React.useEffect(() => {
-        if (reservation) {
-            (async () => {
-                setLoading(true)
-                setIsPPC(true)
-                const a = currencyFormatter.format(Math.ceil((total - 99 - 5000) / 24) + (breakdown ? 29 : 0))
-                setAmountText(`${a} /mo`)
-                const req = await fetch('/api/pay-by-ppc', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ reservation, breakdown, total })
-                })
-
-                if (req.ok) {
-                    const { client_secret } = await req.json()
-                    setClientSecret(client_secret)
-                }
-                setLoading(false)
-            })()
+        console.log(reservation)
+        if (reservation && !loading && show) {
+            console.log('calling pay by ppc')
+            loadPPC()
         }
-    }, [breakdown, reservation])
+    }, [breakdown, reservation, show])
     const paymentSection = React.useMemo(() => {
 
         if (clientSecret) {

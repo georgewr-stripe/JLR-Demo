@@ -40,7 +40,10 @@ export default async function handler(req, res) {
         description: `${car.name} Full Payment`,
         amount: (car.price * 100) - 9900,
         currency: 'GBP',
-        invoice: invoice.id
+        invoice: invoice.id,
+        metadata: {
+            SAP_ID: '345'
+        }
     });
     if (config) {
         for (let conf of config) {
@@ -49,7 +52,10 @@ export default async function handler(req, res) {
                 description: conf.name,
                 amount: conf.price * 100,
                 currency: 'GBP',
-                invoice: invoice.id
+                invoice: invoice.id,
+                metadata: {
+                    SAP_ID: '123'
+                }
             });
         }
     }

@@ -16,7 +16,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ 'error': 'no customer id found' })
     }
 
-    const monthly_amount = Math.ceil((reservation.total - 9900 - 5000000) / 24);
+    const monthly_amount = Math.ceil((reservation.total - 9900 - 500000) / 24);
 
 
     const ppcProduct = await _getPPCProduct()
