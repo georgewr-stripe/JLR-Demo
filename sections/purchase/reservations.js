@@ -90,7 +90,7 @@ const ReservationsSection = ({ show, setSection, reservations }) => {
     const payByPPC = async () => {
         setLoading(true)
         setIsPPC(true)
-        setAmountText(currencyFormatter.format(5000))
+        setAmountText(currencyFormatter.format(5000) + ' Deposit')
         const req = await fetch('/api/deposit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

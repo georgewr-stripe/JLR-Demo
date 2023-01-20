@@ -75,7 +75,7 @@ const PPCSection = ({ show, setSection, reservations, breakdown }) => {
         setLoading(true)
         setIsPPC(true)
         const a = currencyFormatter.format(Math.ceil((total - 99 - 5000) / 24) + (breakdown ? 29 : 0))
-        setAmountText(`${a} /mo`)
+        setAmountText(`${a} PPC /mo`)
         const req = await fetch('/api/pay-by-ppc', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

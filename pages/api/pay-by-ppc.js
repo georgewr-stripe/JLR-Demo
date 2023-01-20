@@ -85,8 +85,10 @@ export default async function handler(req, res) {
     let invoice = await stripe.invoices.update(subscription.latest_invoice, {
         payment_settings: {
             payment_method_types: ['bacs_debit'],
-
         },
+        metadata: {
+            SAP_INVOICE_ID: '1234'
+        }
     })
 
     invoice = await stripe.invoices.finalizeInvoice(subscription.latest_invoice);
